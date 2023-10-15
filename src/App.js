@@ -1,23 +1,33 @@
-import logo from './logo.svg';
 import './App.css';
+import React, { useState, useEffect } from 'react';
+import { apiFullCall } from './helpers/apiHelper';
+import TeachersView from './people/teachers';
+import StudentsView from './people/students';
 
 function App() {
+  const [students, setStudents] = useState([]);
+  const [teachers, setTeachers] = useState([]);
+  const [reload, setReload] = useState(false);
+
+  useEffect(() => {
+    apiFullCall({}, 'get', `students/`).then((response) => {
+      if (response) {
+        setStudents(response.body.results);
+      }
+    }).catch((error) => error);
+
+    apiFullCall({}, 'get', `teachers/`).then((response) => {
+      if (response) {
+        setTeachers(response.body.results);
+      }
+    }).catch((error) => error);
+  }, [reload]);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <TeachersView teachers={teachers} setReload={setReload} reload={reload} />
+
+      <StudentsView students={students} setReload={setReload} reload={reload} />
     </div>
   );
 }
